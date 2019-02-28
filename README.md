@@ -13,3 +13,6 @@ Soruce
   - **Debug**
   
 ~~RIP MY ENG SKILL~~ 
+
+Contact Me
+ - http://discord.gg/deqvJfe
