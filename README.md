@@ -1,5 +1,5 @@
 # CsGoSimpleExternal
-csgo external cheat for **learning **
+csgo external cheat for __learning__
 
 *pls ignore my english skill and filename *
 
