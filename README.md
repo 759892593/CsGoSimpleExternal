@@ -6,6 +6,6 @@ csgo external cheat for **learning **
 Soruce
   - EngineSdk     : Setviewangle ForceJump Getplayerbyindex etc 
   - SimpleCheats  : Simple GlowFunction
-  - Math          : Viewanglecalulater 
+  - Math          : Viewanglecalculater 
   
 ~~RIP MY ENG SKILL~~ 
