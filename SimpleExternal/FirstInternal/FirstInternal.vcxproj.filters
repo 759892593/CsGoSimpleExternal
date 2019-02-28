@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\math">
+      <UniqueIdentifier>{544e8d97-567b-44a9-8f34-9ec586954db9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\offset">
+      <UniqueIdentifier>{9801864a-046f-4bb6-b9ca-6f1ca7be673a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\process">
+      <UniqueIdentifier>{3f1b52c7-a1d0-471e-bd8d-ce62c38097a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="enginesdk %28%3f%29">
+      <UniqueIdentifier>{4584b2c4-dc0f-47eb-a781-6e7d4f094c03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="enginesdk %28%3f%29\engine">
+      <UniqueIdentifier>{ead7d37b-c1f8-4b48-b17a-01cb23acdb0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="enginesdk %28%3f%29\vac bypass leak OwO">
+      <UniqueIdentifier>{02262474-6fbc-4de4-894d-5a8db9f84420}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH.cpp">
+      <Filter>Header Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="define.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OOF.cpp">
+      <Filter>Header Files\offset</Filter>
+    </ClCompile>
+    <ClCompile Include="vac bypass leak.cpp">
+      <Filter>enginesdk %28%3f%29\vac bypass leak OwO</Filter>
+    </ClCompile>
+    <ClCompile Include="guichigang.cpp">
+      <Filter>enginesdk %28%3f%29\engine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MATH.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="fuckfurry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OOF.h">
+      <Filter>Header Files\offset</Filter>
+    </ClInclude>
+    <ClInclude Include="Header.h">
+      <Filter>Header Files\process</Filter>
+    </ClInclude>
+    <ClInclude Include="lilpump.h">
+      <Filter>enginesdk %28%3f%29\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="vac bypass leak.hpp">
+      <Filter>enginesdk %28%3f%29\vac bypass leak OwO</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
