@@ -12,7 +12,7 @@ Soruce
   - x86 
   - **Debug**
   
-*Bug Issue *
+*Bug Issue*
   - getbonepos : return wrong z position [WillFixS00n]
   
   
