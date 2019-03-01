@@ -5,30 +5,34 @@
 
 namespace OOF {
 	namespace netvars {
-		extern DWORD m_vecOrigin ;
-		extern DWORD m_lifeState ;
-		extern DWORD m_iTeamNum ;
-		extern DWORD m_iHealth ;
-		extern DWORD m_dwBoneMatrix; 
-		extern DWORD m_iShotsFired;
-		extern DWORD m_aimPunchAngle;
-		extern DWORD m_iGlowIndex;
-		extern DWORD m_iCrosshairId;
-		extern DWORD m_fFlags;
-		extern DWORD m_bSpotted;
-		extern DWORD m_bSpottedByMask;
+		extern uintptr_t m_vecOrigin ;
+		extern uintptr_t m_lifeState ;
+		extern uintptr_t m_iTeamNum ;
+		extern uintptr_t m_iHealth ;
+		extern uintptr_t m_dwBoneMatrix; 
+		extern uintptr_t m_iShotsFired;
+		extern uintptr_t m_aimPunchAngle;
+		extern uintptr_t m_iGlowIndex;
+		extern uintptr_t m_iCrosshairId;
+		extern uintptr_t m_fFlags;
+		extern uintptr_t m_bSpotted;
+		extern uintptr_t m_bSpottedByMask;
+		
 	}
 	namespace signatures {
-		extern DWORD dwClientState ;
-		extern DWORD dwEntityList ;
-		extern DWORD dwClientState_ViewAngles ;
-		extern DWORD dwLocalPlayer;
-		extern DWORD dwbSendPackets;
-		extern DWORD dwForceAttack;
-		extern DWORD dwGlowObjectManager;
-		extern DWORD dwForceJump;
-		extern DWORD dwRadarBase;
-		extern DWORD clientstate_last_outgoing_command;
-		extern DWORD dwInput ;
+		extern uintptr_t dwClientState ;
+		extern uintptr_t dwEntityList ;
+		extern uintptr_t dwClientState_ViewAngles ;
+		extern uintptr_t dwLocalPlayer;
+		extern uintptr_t dwbSendPackets;
+		extern uintptr_t dwForceAttack;
+		extern uintptr_t dwGlowObjectManager;
+		extern uintptr_t dwForceJump;
+		extern uintptr_t dwRadarBase;
+		extern uintptr_t clientstate_last_outgoing_command;
+		extern uintptr_t dwInput ;
+		extern uintptr_t dwClientState_PlayerInfo;
+		extern uintptr_t dwSetClanTag;
+		extern uintptr_t m_bDormant;
 	}
 }

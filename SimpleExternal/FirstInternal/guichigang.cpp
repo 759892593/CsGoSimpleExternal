@@ -2,8 +2,8 @@
 #include "OOF.h"
 #include "define.h"
 
-DWORD enginetools::getentbyindex(int i) {
-	DWORD player = Mem::Read<DWORD>(Hack.__dwordClient + OOF::signatures::dwEntityList + (i * 0x10));
+uintptr_t enginetools::getentbyindex(int i) {
+	uintptr_t player = Mem::Read<uintptr_t>(Hack.Client + OOF::signatures::dwEntityList + (i * 0x10));
 
 	return player;
 }
@@ -20,26 +20,33 @@ Vector enginetools::GetAngle() {
 }
 
 void enginetools::SendPacket(bool a) {
-	Mem::Write<bool>(Hack.__dwordEngine + OOF::signatures::dwbSendPackets, a);
+	Mem::Write<bool>(Hack.Engine + OOF::signatures::dwbSendPackets, a);
 
 }
-void enginetools::Jump() { Mem::Write<int>(Hack.__dwordClient + OOF::signatures::dwForceJump, 6); }
-void enginetools::Fire() { Mem::Write<int>(Hack.__dwordClient + OOF::signatures::dwForceAttack, 6); }
-void enginetools::UnFire() { Mem::Write<int>(Hack.__dwordClient + OOF::signatures::dwForceAttack, 4); }
+void enginetools::Jump() { Mem::Write<int>(Hack.Client + OOF::signatures::dwForceJump, 6); }
+void enginetools::Fire() { Mem::Write<int>(Hack.Client + OOF::signatures::dwForceAttack, 6); }
+void enginetools::UnFire() { Mem::Write<int>(Hack.Client + OOF::signatures::dwForceAttack, 4); }
 
-void Glow(int i) {
+void Mem::WriteMem(uintptr_t address, LPVOID lpBuffer, uintptr_t size) { WriteProcessMemory(Hack.__HandleProcess, (LPVOID)address, lpBuffer, size, 0); }
+void Mem::ReadMem(uintptr_t address, LPVOID lpBuffer, uintptr_t size) { ReadProcessMemory(Hack.__HandleProcess, (LPVOID)address, lpBuffer, size, 0); }
+
+
+void Glow(int i, Color c, bool fullblom) 
+{
 	int a = i * 56;
-	Color c(255,0,0,255);
 
-	GlowBool b(true,false,false);
+	GlowBool b(true,false, fullblom);
 
-	DWORD glowobj = Mem::Read<DWORD>(Hack.__dwordClient + OOF::signatures::dwGlowObjectManager);
+	uintptr_t glowobj = Mem::Read<uintptr_t>(Hack.Client + OOF::signatures::dwGlowObjectManager);
 	Mem::Write<Color>(glowobj + (a + 0x4), c);
 	Mem::Write<GlowBool>(glowobj + (a + 0x24), b);
 }
 
-char* getName(int index)//Entity index 1...32
+string getName(int index) //Entity index 1...32
 {
+	
+
+	
 	struct player_info
 	{
 		__int64         unknown;            //0x0000 
@@ -63,18 +70,22 @@ char* getName(int index)//Entity index 1...32
 		unsigned int    customfiles[4];
 		unsigned char   filesdownloaded;
 	} var;
-
+		
 	memset(&var, 0, sizeof(var));
-	DWORD userInfoTable = Mem::Read<DWORD>(Hack.__ClientStauts + 0x5240);
-	DWORD items = Mem::Read<DWORD>(Mem::Read<DWORD>(userInfoTable + 0x40) + 0xC);
 
-	var = Mem::Read<player_info>(Mem::Read<DWORD>(items + 0x28 + ((index - 1) * 0x34)));
-	DWORD abc = Mem::Read<DWORD>(items + 0x28 + ((index - 1) * 0x34));
-	// **player_info
-	cout << index << " "<< Mem::Read<DWORD>(items + 0x28 + ((index - 1) * 0x34)) << endl;
-	//cout << var.szName << endl;
-	return var.szName;
+	uintptr_t userInfoTable = Mem::Read<uintptr_t>(Hack.__ClientStauts + OOF::signatures::dwClientState_PlayerInfo);
+	uintptr_t items = Mem::Read<uintptr_t>(Mem::Read<uintptr_t>(userInfoTable + 0x40) + 0xC); // 0x3C
+
+	var = Mem::Read<player_info>(Mem::Read<uintptr_t>(items + 0x28 + ((index - 1) * 0x34)));
+	string name = string(var.szName);
+	//cout << name << endl;
+	return name;
+	
+
+
 }
+
+
 #define MULTIPLAYER_BACKUP    150
 #include <thread>
 
@@ -85,7 +96,7 @@ Vector enginetools::GetCmdAngle()
 {
 	int iCurrentSequenceNumber = Mem::Read<int>(Hack.__ClientStauts + OOF::signatures::clientstate_last_outgoing_command);
 	iCurrentSequenceNumber += 2;
-	DWORD dwUserCMD = Mem::Read<DWORD>(Hack.__dwordClient + OOF::signatures::dwInput + 0xF4);
+	uintptr_t dwUserCMD = Mem::Read<uintptr_t>(Hack.Client + OOF::signatures::dwInput + 0xF4);
 	dwUserCMD += (iCurrentSequenceNumber % 150);
 	UserCmd_t Cmd = Mem::Read<UserCmd_t>(dwUserCMD);
 	cout << " Cmd.m_iCmdNumber :" << Cmd.m_iCmdNumber << " iCurrentSequenceNumber:" << iCurrentSequenceNumber << endl;
@@ -101,7 +112,7 @@ Vector enginetools::GetCmdAngle()
 UserCmd_t enginetools::GetUserCmd(int seqnum)
 {
 	int iCurrentSequenceNumber = seqnum + 2;
-	DWORD dwUserCMD = Mem::Read<DWORD>(Hack.__dwordClient + OOF::signatures::dwInput + 0xF4);
+	uintptr_t dwUserCMD = Mem::Read<uintptr_t>(Hack.Client + OOF::signatures::dwInput + 0xF4);
 	dwUserCMD += (iCurrentSequenceNumber % 150);
 	UserCmd_t Cmd = Mem::Read<UserCmd_t>(dwUserCMD);
 	return Cmd;
@@ -111,4 +122,77 @@ int enginetools::GetiCurrentSequenceNumber()
 	int iCurrentSequenceNumber = Mem::Read<int>(Hack.__ClientStauts + OOF::signatures::clientstate_last_outgoing_command);
 
 	return iCurrentSequenceNumber;
+}
+
+#define MAX_TEXT_SIZE  15
+void enginetools::SetClanTag(string tagstring)
+{
+	static bool allocit = false;
+	const char* tag = tagstring.c_str();
+	const char* name = "BLANK";
+	HANDLE ProcessHandle = Hack.__HandleProcess;
+
+	/*
+		51						push	ecx
+		52						push	edx
+		B9 00 00 00 00			mov		ecx, tag
+		BA 00 00 00 00			mov	    edx, name
+		E8 00 00 00 00			call	0
+		83 04 24 0A				add		dword ptr [esp], 0A
+		68 00 00 00 00			push	engine.dll + OFFSET
+		C3						ret
+		5A						pop		edx
+		59						pop		ecx
+		C3						ret
+		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	*/
+	unsigned char Shellcode[] =
+		"\x51"
+		"\x52"
+		"\xB9\x00\x00\x00\x00"
+		"\xBA\x00\x00\x00\x00"
+		"\xE8\x00\x00\x00\x00"
+		"\x83\x04\x24\x0A"
+		"\x68\x00\x00\x00\x00"
+		"\xC3"
+		"\x5A"
+		"\x59"
+		"\xC3"
+		"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+
+	unsigned int SHELLCODE_SIZE = sizeof(Shellcode) - 0x21;
+	unsigned int TAG_SIZE = (strlen(tag) > MAX_TEXT_SIZE) ? MAX_TEXT_SIZE : strlen(tag);
+	unsigned int NAME_SIZE = (strlen(name) > MAX_TEXT_SIZE) ? MAX_TEXT_SIZE : strlen(name);
+	unsigned int DATA_SIZE = TAG_SIZE + NAME_SIZE + 2;
+	LPVOID ShellCodeAdr = 0;
+	if (!allocit)
+	{
+		LPVOID ShellCodeAddress = VirtualAllocEx(ProcessHandle,
+			0,
+			SHELLCODE_SIZE + DATA_SIZE,
+			MEM_COMMIT | MEM_RESERVE,
+			PAGE_EXECUTE_READWRITE
+		);
+
+		DWORD dwTagAddress = (DWORD)ShellCodeAddress + SHELLCODE_SIZE;
+		DWORD dwNameAddress = (DWORD)ShellCodeAddress + SHELLCODE_SIZE + TAG_SIZE + 1;
+		DWORD dwSetClanAddress = Hack.Engine + OOF::signatures::dwSetClanTag;
+
+		memcpy(Shellcode + 0x3, &dwTagAddress, sizeof(DWORD));
+		memcpy(Shellcode + 0x8, &dwNameAddress, sizeof(DWORD));
+		memcpy(Shellcode + 0x16, &dwSetClanAddress, sizeof(DWORD));
+		memcpy(Shellcode + SHELLCODE_SIZE, tag, TAG_SIZE);
+		memcpy(Shellcode + SHELLCODE_SIZE + TAG_SIZE + 1, name, NAME_SIZE);
+
+		WriteProcessMemory(ProcessHandle, ShellCodeAddress, Shellcode, SHELLCODE_SIZE + DATA_SIZE, 0);
+		ShellCodeAdr = ShellCodeAddress;
+		allocit = true;
+	}
+
+	HANDLE hThread = CreateRemoteThread(ProcessHandle, NULL, NULL, (LPTHREAD_START_ROUTINE)ShellCodeAdr, NULL, NULL, NULL);
+	WaitForSingleObject(hThread, INFINITE);
+	//VirtualFreeEx(ProcessHandle, ShellCodeAddress, 0, MEM_RELEASE);
+
 }

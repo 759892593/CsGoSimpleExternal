@@ -210,7 +210,7 @@ struct VerifiedUserCmd_t {
 	uint32_t  m_Crc;
 };
 
-extern char* getName(int index);
+extern string getName(int index);
 
 struct Color {
 	Color(int r1, int b1, int g1, int a1) {
@@ -218,6 +218,13 @@ struct Color {
 		g = g1 / 255;
 		b = b1 / 255;
 		a = a1 / 255;
+	}
+	Color(float r1, float b1, float g1, float a1)
+	{
+		r = r1 ;
+		g = g1 ;
+		b = b1 ;
+		a = a1 ;
 	}
 	float r, g, b,a;
 
@@ -230,28 +237,32 @@ struct GlowBool {
 	bool glow, unkow, fullbloom;
 };
 
-extern void Glow(int i);
+void Glow(int i, Color c, bool fullblom);
+
 namespace Mem
 {
 	template<typename TYPE>
-	TYPE Read(DWORD address) {
+	TYPE Read(uintptr_t address) {
 		TYPE buffer;
 		ReadProcessMemory(Hack.__HandleProcess, (LPCVOID)address, &buffer, sizeof(buffer), 0);
 		return buffer;
 	}
 	template<typename TYPE>
-	TYPE Write(DWORD address, TYPE buffer) {
+	TYPE Write(uintptr_t address, TYPE buffer) {
 		WriteProcessMemory(Hack.__HandleProcess, (LPVOID)address, &buffer, sizeof(buffer), 0);
 		return buffer;
 	}
-	void Read(DWORD address, LPVOID lpBuffer, DWORD size) {
-		WriteProcessMemory(Hack.__HandleProcess, (LPVOID)address, lpBuffer, size, 0);
-	}
+	
+	void WriteMem(uintptr_t address, LPVOID lpBuffer, uintptr_t size);
+	void ReadMem(uintptr_t address, LPVOID lpBuffer, uintptr_t size);
+
+	
+	
 }
 
 
 namespace enginetools {
-	DWORD getentbyindex(int i);
+	uintptr_t getentbyindex(int i);
 	void SetViewAngle(Vector aimat);
 	UserCmd_t GetUserCmd(int seqnum);
 	Vector GetAngle();
@@ -261,17 +272,22 @@ namespace enginetools {
 	void Fire();
 	void UnFire();
 	void Jump();
-	
+	void SetClanTag(string tagstring);
 }
 
 
-void Glow(int i);
+void Glow(int i, Color c, bool fullblom);
 
-
-typedef struct
+class BoneMatrix
 {
-	float flMatrix[3][4];
-}Bonematrix;
+public:
+	byte pad3[12];
+	float x;
+	byte pad1[12];
+	float y;
+	byte pad2[12];
+	float z;
+};
 
 
 struct CBaseEntity {
@@ -282,40 +298,35 @@ struct CBaseEntity {
 	int glowindex;
 	int flags;
 	int crosshairid;
+	int dormant;
 	string name;
 	Vector position;
-	DWORD playerbase;
-	DWORD playerbonemtrix;
+	uintptr_t playerbase;
+	uintptr_t playerbonemtrix;
 
 	Vector bonepos;
 
-
-	CBaseEntity(DWORD adr = 0) {
-		playerbase = Mem::Read <DWORD>(Hack.__dwordClient + adr);
+	
+	CBaseEntity(uintptr_t adr = 0) {
+		playerbase = Mem::Read <uintptr_t>(Hack.Client + adr);
 	}
 	void Read() { 
 		health = Mem::Read<int>(playerbase + OOF::netvars::m_iHealth);
 		team = Mem::Read<int>(playerbase + OOF::netvars::m_iTeamNum);
 		dead = Mem::Read<bool>(playerbase + OOF::netvars::m_lifeState);
 		shootfired = Mem::Read<int>(playerbase + OOF::netvars::m_iShotsFired);
-		playerbonemtrix = Mem::Read<DWORD>(playerbase + OOF::netvars::m_dwBoneMatrix);
+		playerbonemtrix = Mem::Read<uintptr_t>(playerbase + OOF::netvars::m_dwBoneMatrix);
 		position = Mem::Read<Vector>(playerbase + OOF::netvars::m_vecOrigin);
 		glowindex = Mem::Read<int>(playerbase + OOF::netvars::m_iGlowIndex);
 		flags = Mem::Read<int>(playerbase + OOF::netvars::m_fFlags);
 		crosshairid = Mem::Read<int>(playerbase + OOF::netvars::m_iCrosshairId);
-		
+		dormant = Mem::Read<int>(playerbase + OOF::signatures::m_bDormant);
 	}
 	Vector GetBonePos(int bone) {
 
-		Bonematrix boneMatrix;
-
-		ReadProcessMemory(Hack.__HandleProcess, (PBYTE*)(playerbonemtrix + (0x30 * bone)), &boneMatrix, sizeof(Bonematrix), 0);
-
-		Vector returnn;
-		returnn.x = boneMatrix.flMatrix[0][3];
-		returnn.y = boneMatrix.flMatrix[1][3];
-
-		return returnn;
+		BoneMatrix A;
+		A = Mem::Read<BoneMatrix>(playerbonemtrix + sizeof(BoneMatrix)*bone);
+		return Vector(A.x, A.y, A.z );
 	}
 
 	Vector GetPunchAngle() {
@@ -338,3 +349,4 @@ struct Target_t {
 	}
 
 };
+

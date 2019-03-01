@@ -16,9 +16,9 @@ public:
 	PROCESSENTRY32 __gameProcess;
 	HANDLE __HandleProcess;
 	HWND __HWNDCss;
-	DWORD __dwordClient;
-	DWORD __dwordEngine;
-	DWORD __ClientStauts;
+	uintptr_t Client;
+	uintptr_t Engine;
+	uintptr_t __ClientStauts;
 	DWORD FindProcessName(const char *__ProcessName, PROCESSENTRY32 *pEntry)
 	{
 		PROCESSENTRY32 __ProcessEntry;
@@ -42,7 +42,7 @@ public:
 	}
 
 
-	DWORD getThreadByProcess(DWORD __DwordProcess)
+	DWORD getThreadByProcess(DWORD __uintptr_tProcess)
 	{
 		THREADENTRY32 __ThreadEntry;
 		__ThreadEntry.dwSize = sizeof(THREADENTRY32);
@@ -52,7 +52,7 @@ public:
 		if (!Thread32First(hSnapshot, &__ThreadEntry)) { CloseHandle(hSnapshot); return 0; }
 
 		do {
-			if (__ThreadEntry.th32OwnerProcessID == __DwordProcess)
+			if (__ThreadEntry.th32OwnerProcessID == __uintptr_tProcess)
 			{
 				CloseHandle(hSnapshot);
 				return __ThreadEntry.th32ThreadID;
@@ -62,10 +62,10 @@ public:
 		return 0;
 	}
 
-	DWORD GetModuleNamePointer(LPSTR LPSTRModuleName, DWORD __DwordProcessId)
+	DWORD GetModuleNamePointer(LPSTR LPSTRModuleName, DWORD __uintptr_tProcessId)
 	{
 		MODULEENTRY32 lpModuleEntry = { 0 };
-		HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, __DwordProcessId);
+		HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, __uintptr_tProcessId);
 		if (!hSnapShot)
 			return NULL;
 		lpModuleEntry.dwSize = sizeof(lpModuleEntry);
@@ -108,11 +108,11 @@ public:
 		while (!FindProcessName("csgo.exe", &__gameProcess));
 		while (!(getThreadByProcess(__gameProcess.th32ProcessID)));
 		__HandleProcess = OpenProcess(PROCESS_ALL_ACCESS, false, __gameProcess.th32ProcessID);
-		while (__dwordClient == 0x0) __dwordClient = GetModuleNamePointer("client_panorama.dll", __gameProcess.th32ProcessID);
-		cout << "client_panoramd.dll : " << hex << __dwordClient  << endl;
-		while (__dwordEngine == 0x0) __dwordEngine = GetModuleNamePointer("engine.dll", __gameProcess.th32ProcessID);
-		cout << "engine.dll : " << hex <<__dwordEngine << endl;
-		ReadProcessMemory(__HandleProcess,(PBYTE*)(__dwordEngine + OOF::signatures::dwClientState),&__ClientStauts,sizeof(DWORD),0);
+		while (Client == 0x0) Client = GetModuleNamePointer("client_panorama.dll", __gameProcess.th32ProcessID);
+		cout << "client_panoramd.dll : " << hex << Client << endl;
+		while (Engine == 0x0) Engine = GetModuleNamePointer("engine.dll", __gameProcess.th32ProcessID);
+		cout << "engine.dll : " << hex << Engine << endl;
+		ReadProcessMemory(__HandleProcess,(PBYTE*)(Engine + OOF::signatures::dwClientState),&__ClientStauts,sizeof(uintptr_t),0);
 		cout << "__ClientStauts : " << hex <<__ClientStauts << endl;
 		__HWNDCss = FindWindow(NULL, "Counter-Strike: Global Offsensive");
 	}
