@@ -17,7 +17,8 @@ Vector MATH::CalcAngle(Vector src, Vector dst) // Same thing maybe
 	angles.z = 0.0f;
 	if (Delta[0] >= 0.0) angles.y += 180.0f;
 
-	return MATH::clampAngle(angles);
+	clampAngle(angles);
+	return(angles);
 }
 
 Vector MATH::anglecalc(Vector source, Vector destination) { // CalcAimanle 
@@ -38,8 +39,8 @@ Vector MATH::anglecalc(Vector source, Vector destination) { // CalcAimanle
 	{
 		AimAngle.y += 180.0f;
 	}
-
-	return clampAngle(AimAngle);
+	clampAngle(AimAngle);
+	return (AimAngle);
 }
 
 Vector MATH::RCSCalcAngle(Vector source, Vector destination,Vector RCS) { // CalcAimanle with recoil 
@@ -64,8 +65,8 @@ Vector MATH::RCSCalcAngle(Vector source, Vector destination,Vector RCS) { // Cal
 	{
 		AimAngle.y += 180.0f;
 	}
-	
-	return clampAngle(AimAngle);
+	clampAngle(AimAngle);
+	return (AimAngle);
 }
 
 
@@ -113,7 +114,7 @@ void MATH::MakeSmooth(Vector org,Vector aimbot, Vector* aimat, float smooth) { /
 }
 			
 
-Vector MATH::clampAngle(Vector vIn) // Check if	Angle not fuck up
+void MATH::clampAngle(Vector& vIn) 
 {
 	if (vIn.x > 89.0f && vIn.x <= 180.0f)
 	{
@@ -153,7 +154,6 @@ Vector MATH::clampAngle(Vector vIn) // Check if	Angle not fuck up
 		vIn.z = 0;
 	}
 
-	return vIn;
 }
 
 

@@ -122,7 +122,17 @@ struct Vector {
 	{
 		return Vector(x / v, y / v, z / v);
 	}
-
+	/*
+	inline float distance(Vector v)
+	{
+		//d = ((x2 - x1)2 + (y2 - y1)2 + (z2 - z1)2)1/2  
+		float x_diff = (v.x - x) * (v.x - x);
+		float y_diff = (v.y - y) * (v.y - y);
+		float z_diff = (v.z - z) * (v.z - z);
+		float distance = sqrt(x_diff + y_diff + z_diff);
+		return distance;
+	}
+	*/
 };
 
 inline bool Vector::operator==(const Vector &v) const
@@ -133,6 +143,11 @@ inline bool Vector::operator!=(const Vector &e) const
 {
 	return e.x != x || e.y != y || e.z != z;
 }
+
+
+
+
+/*
 struct Input_t {
 	uintptr_t m_pVftable;                   // 0x00
 	bool      m_bTrackIRAvailable;          // 0x04
@@ -199,16 +214,11 @@ struct UserCmd_t {
 	bool      m_bHasBeenPredicted; // 0x48
 	uint8_t   Pad2[27];
 }; // size is 100 or 0x64
-
-struct SilentTest 
-{
-	int iCurrentSequenceNumber;
-	UserCmd_t UserCmd;
-};
 struct VerifiedUserCmd_t {
 	UserCmd_t m_Command;
 	uint32_t  m_Crc;
 };
+*/
 
 extern string getName(int index);
 
@@ -264,9 +274,8 @@ namespace Mem
 namespace enginetools {
 	uintptr_t getentbyindex(int i);
 	void SetViewAngle(Vector aimat);
-	UserCmd_t GetUserCmd(int seqnum);
+	//UserCmd_t GetUserCmd(int seqnum);
 	Vector GetAngle();
-	Vector GetCmdAngle();
 	int GetiCurrentSequenceNumber();
 	void SendPacket(bool a);
 	void Fire();
@@ -278,19 +287,9 @@ namespace enginetools {
 
 void Glow(int i, Color c, bool fullblom);
 
-class BoneMatrix
+class CBaseEntity 
 {
 public:
-	byte pad3[12];
-	float x;
-	byte pad1[12];
-	float y;
-	byte pad2[12];
-	float z;
-};
-
-
-struct CBaseEntity {
 	int health;
 	int team;
 	int shootfired;
@@ -301,6 +300,8 @@ struct CBaseEntity {
 	int dormant;
 	string name;
 	Vector position;
+	Vector punch_angle;
+	Vector viewoffset;
 	uintptr_t playerbase;
 	uintptr_t playerbonemtrix;
 
@@ -308,7 +309,21 @@ struct CBaseEntity {
 
 	
 	CBaseEntity(uintptr_t adr = 0) {
-		playerbase = Mem::Read <uintptr_t>(Hack.Client + adr);
+		playerbase = adr;
+	}
+
+	uintptr_t operator= (const uintptr_t base)
+	{
+		CBaseEntity a(base);
+		return a;
+	}
+	bool operator! ()
+	{
+		return (playerbase == 0);
+	}
+	operator bool() const 
+	{
+		return (playerbase != 0);
 	}
 	void Read() { 
 		health = Mem::Read<int>(playerbase + OOF::netvars::m_iHealth);
@@ -321,32 +336,23 @@ struct CBaseEntity {
 		flags = Mem::Read<int>(playerbase + OOF::netvars::m_fFlags);
 		crosshairid = Mem::Read<int>(playerbase + OOF::netvars::m_iCrosshairId);
 		dormant = Mem::Read<int>(playerbase + OOF::signatures::m_bDormant);
+		punch_angle = Mem::Read<Vector>(playerbase + OOF::netvars::m_aimPunchAngle);
+		viewoffset = Mem::Read<Vector>(playerbase + OOF::netvars::m_vecViewOffset);
 	}
 	Vector GetBonePos(int bone) {
-
-		BoneMatrix A;
-		A = Mem::Read<BoneMatrix>(playerbonemtrix + sizeof(BoneMatrix)*bone);
-		return Vector(A.x, A.y, A.z );
+		float x = Mem::Read<float>(playerbonemtrix + 0x30 * bone + 0xC);
+		float y = Mem::Read<float>(playerbonemtrix + 0x30 * bone + 0x1C);
+		float z = Mem::Read<float>(playerbonemtrix + 0x30 * bone + 0x2C);
+		return Vector(x, y, z );
 	}
-
+	Vector geteyepos()
+	{
+		return (position + viewoffset);
+	}
 	Vector GetPunchAngle() {
 		Vector a = Mem::Read<Vector>(playerbase + OOF::netvars::m_aimPunchAngle); 
 		return a;
 		
 	}
-};
-
-struct Target_t {
-	string name;
-	int healt;
-	double fov;
-	float distance;
-	Vector aimat;
-	void A(double fov1,Vector aim) {
-
-		fov = fov1;
-		aimat = aim;
-	}
-
 };
 

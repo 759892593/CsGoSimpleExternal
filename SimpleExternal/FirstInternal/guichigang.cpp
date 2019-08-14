@@ -4,7 +4,6 @@
 
 uintptr_t enginetools::getentbyindex(int i) {
 	uintptr_t player = Mem::Read<uintptr_t>(Hack.Client + OOF::signatures::dwEntityList + (i * 0x10));
-
 	return player;
 }
 
@@ -12,16 +11,13 @@ void enginetools::SetViewAngle(Vector aimat) {
 	
 	Mem::Write<Vector>(Hack.__ClientStauts + OOF::signatures::dwClientState_ViewAngles,aimat);
 }
-
 Vector enginetools::GetAngle() { 
 	Vector a;
 	a = Mem::Read<Vector>(Hack.__ClientStauts + OOF::signatures::dwClientState_ViewAngles); 
 	return a; 
 }
-
 void enginetools::SendPacket(bool a) {
 	Mem::Write<bool>(Hack.Engine + OOF::signatures::dwbSendPackets, a);
-
 }
 void enginetools::Jump() { Mem::Write<int>(Hack.Client + OOF::signatures::dwForceJump, 6); }
 void enginetools::Fire() { Mem::Write<int>(Hack.Client + OOF::signatures::dwForceAttack, 6); }
@@ -44,9 +40,7 @@ void Glow(int i, Color c, bool fullblom)
 
 string getName(int index) //Entity index 1...32
 {
-	
 
-	
 	struct player_info
 	{
 		__int64         unknown;            //0x0000 
@@ -78,7 +72,6 @@ string getName(int index) //Entity index 1...32
 
 	var = Mem::Read<player_info>(Mem::Read<uintptr_t>(items + 0x28 + ((index - 1) * 0x34)));
 	string name = string(var.szName);
-	//cout << name << endl;
 	return name;
 	
 
@@ -91,7 +84,7 @@ string getName(int index) //Entity index 1...32
 
 
 
-
+/*
 Vector enginetools::GetCmdAngle()
 {
 	int iCurrentSequenceNumber = Mem::Read<int>(Hack.__ClientStauts + OOF::signatures::clientstate_last_outgoing_command);
@@ -117,6 +110,8 @@ UserCmd_t enginetools::GetUserCmd(int seqnum)
 	UserCmd_t Cmd = Mem::Read<UserCmd_t>(dwUserCMD);
 	return Cmd;
 }
+*/
+
 int enginetools::GetiCurrentSequenceNumber()
 {
 	int iCurrentSequenceNumber = Mem::Read<int>(Hack.__ClientStauts + OOF::signatures::clientstate_last_outgoing_command);
